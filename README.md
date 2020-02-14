@@ -1,1 +1,2 @@
 # Few-shot learning
+Few-shot learning in machine learning aims at learning a model with a very small amount of training data. This framework wants to make it possible to evaluate different few-shot learning algorithms in a standardized way to compare them. In contrast to other frameworks, the usage of own datasets is possible.
