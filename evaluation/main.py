@@ -67,5 +67,7 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
             results = calculate_kpis(predictions, labels)
             print(eidx, len(evaluationsdirs), evaluationdir, aidx, approach, results)
             with open(outfilename + '.csv', "a") as outfile:
+                outfile.write("%s, %d, %s, %d, %s, %d, %d, %s\n" % (evaluationdir, eidx, approach, aidx, results,
+                                                            len(dataset_train), len(dataset_test), train_kpis))
                 outfile.write("%s, %d, %s, %d, %s\n" % (evaluationdir, eidx, approach, aidx, results))
 

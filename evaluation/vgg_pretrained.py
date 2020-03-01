@@ -69,9 +69,17 @@ class VGG_pretrained():
 
         # Train and evaluate
         model.train()
+        train_kpis = {'training_samples': len(dataloader),
+                      'input_size': self.input_size,
+                      'num_classes': self.num_classes,
+                      'max_epochs': self.num_epochs,
+                      'device': self.device,
+                      'feature_extract': self.feature_extract}
+        iteration_counter = 0
         for epoch in range(self.num_epochs):
             print("%s training epoch: %d" % (str(self), epoch))
             for idx, (inputs, labels) in enumerate(dataloader):
+                iteration_counter += 1
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
 
@@ -87,4 +95,5 @@ class VGG_pretrained():
                     # backward + optimize only if in training phase
                     loss.backward()
                     optimizer.step()
-        return model
+        train_kpis['epochs'] = epoch
+        return model, train_kpis
