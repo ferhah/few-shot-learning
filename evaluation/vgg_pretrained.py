@@ -2,6 +2,7 @@ from torchvision import models, transforms
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.tensorboard import SummaryWriter
 
 
 def set_parameter_requires_grad(model, feature_extracting):
@@ -14,6 +15,8 @@ class VGG_pretrained():
     def __init__(self, device=None):
         if device is None:
             device = 'cpu'
+        self.log_dir = None
+        self.writer = None
         self.input_size = 224
         self.num_classes = None
         self.num_epochs = 15
@@ -45,6 +48,11 @@ class VGG_pretrained():
         ]
 
     def train(self, dataloader, log_dir):
+        self.log_dir = log_dir
+        if self.log_dir:
+            self.writer = SummaryWriter(self.log_dir)
+
+
         if self.num_classes is not None:
             assert self.num_classes == len(dataloader.dataset.classes)
         else:
@@ -92,6 +100,8 @@ class VGG_pretrained():
                     # Get model outputs and calculate loss
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
+                    if self.writer:
+                        self.writer.add_scalar('loss', loss, iteration_counter)
                     # backward + optimize only if in training phase
                     loss.backward()
                     optimizer.step()
