@@ -23,7 +23,7 @@ class DataloaderTest(unittest.TestCase):
                 os.mkdir(classfoldername)
                 for kdx in range(10):
                     imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
-                    rndimg = np.random.rand(input_size, input_size).astype(np.uint8)
+                    rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
                     imageio.imsave(imagename, rndimg)
                     fp.write("{};{}\n".format(imagename, idx))
             fp.flush()
