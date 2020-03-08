@@ -48,14 +48,36 @@ class DataloaderTest(unittest.TestCase):
                                                                   [0.229, 0.224, 0.225])
                                          ]))
             dataloader_folder = torch.utils.data.DataLoader(dataset_folder, batch_size=1,
-                                                               shuffle=False, num_workers=3)
+                                                               shuffle=True, num_workers=3)
             dataloader_list = torch.utils.data.DataLoader(dataset_list, batch_size=1,
-                                                               shuffle=False, num_workers=3)
+                                                               shuffle=True, num_workers=3)
 
             # Compare dataloader
-            for (f_img, f_label), (l_img, l_label) in zip(dataloader_folder, dataloader_list):
-                if torch.all(torch.eq(f_img, l_img)):
-                    torch.testing.assert_allclose(f_label, l_label)
+            folder_images = collections.defaultdict(lambda: [])
+            for img, label in dataloader_folder:
+                folder_images[label.item()].append(img)
+
+            imagelist_images = collections.defaultdict(lambda: [])
+            for img, label in dataloader_list:
+                imagelist_images[label.item()].append(img)
+
+            for classname in folder_images:
+                reference_image = folder_images[classname][0]
+                for classname_list in imagelist_images:
+                    for img in imagelist_images[classname_list]:
+                        if torch.all(torch.eq(reference_image, img)):
+                            break
+                    else:
+                        continue
+                    break
+
+                self.assertEqual(len(folder_images[classname]), len(imagelist_images[classname_list]))
+                for f_img in folder_images[classname]:
+                    for l_img in imagelist_images[classname_list]:
+                        if torch.all(torch.eq(f_img, l_img)):
+                            break
+                    else:
+                        self.assertTrue(False, "Image not found")
 
 if __name__ == '__main__':
     unittest.main()
