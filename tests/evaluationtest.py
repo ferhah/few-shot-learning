@@ -29,7 +29,6 @@ class Fixed_prediction_approach(object):
             img[img < 0.001] = 0
             prediction = np.sum(img)
             tensor[idx, int(prediction * 85)] = 1
-        self.counter += 1
         return tensor
 
     @property
