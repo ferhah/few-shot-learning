@@ -15,6 +15,16 @@ def calculate_kpis(predictions, labels):
     results['accuracy'] = accuracy
     return results
 
+def get_dataloader(path, datadir, transforms, batch_size, num_workers, shuffle):
+    if os.path.exists(path):
+        dataset = torchvision.datasets.ImageFolder(path, torchvision.transforms.Compose(transforms))
+    else:
+        dataset = ImagelistData(root=datadir, imagelistname=path + '.txt',
+                                transform=torchvision.transforms.Compose(transforms))
+
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
+                                             shuffle=shuffle, num_workers=num_workers)
+    return dataloader
 
 def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_batch_size, num_workers, datadir=None):
     # List of all dirs, containing a small training dataset (/train or /train.txt) and a  test dir (/test or /test.txt).
@@ -25,33 +35,17 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
         for aidx, approach in enumerate(approaches):
             print(evaluationdir, approach)
             # Load Training dataset
-            if os.path.exists(os.path.join(evaluationdir, 'train')):
-                dataset_train = torchvision.datasets.ImageFolder(os.path.join(evaluationdir, 'train'),
-                                                                 torchvision.transforms.Compose(
-                                                                     approach.train_transforms))
-            else:
-                dataset_train = ImagelistData(root=datadir, imagelistname=os.path.join(evaluationdir, 'train.txt'),
-                                              transform=torchvision.transforms.Compose(approach.train_transforms))
-
-            dataloader_train = torch.utils.data.DataLoader(dataset_train, batch_size=train_batch_size,
-                                                           shuffle=True, num_workers=num_workers)
+            dataloader_train = get_dataloader(os.path.join(evaluationdir, 'train'), datadir, approach.train_transforms,
+                                              train_batch_size, num_workers, True)
 
             # Train model
             # Call a specific training function
             model = approach.train(dataloader_train, "%s_run_%d_%d" % (outfilename, eidx, aidx))
             print("Start Evaluation")
             # Load Evaluation dataset
-            # Standard pytroch loader
-            if os.path.exists(os.path.join(evaluationdir, 'test')):
-                dataset_test = torchvision.datasets.ImageFolder(os.path.join(evaluationdir, 'test'),
-                                                                 torchvision.transforms.Compose(
-                                                                     approach.inference_transforms))
-            else:
-                dataset_test = ImagelistData(root=datadir, imagelistname=os.path.join(evaluationdir, 'test.txt'),
-                                              transform=torchvision.transforms.Compose(approach.inference_transforms))
-
-            dataloader_test = torch.utils.data.DataLoader(dataset_test, batch_size=val_batch_size,
-                                                          shuffle=False, num_workers=num_workers)
+            dataloader_test = get_dataloader(os.path.join(evaluationdir, 'test'), datadir,
+                                             approach.inference_transforms,
+                                             val_batch_size, num_workers, False)
 
             predictions = []
             labels = []
