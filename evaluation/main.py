@@ -26,6 +26,18 @@ def get_dataloader(path, datadir, transforms, batch_size, num_workers, shuffle):
                                              shuffle=shuffle, num_workers=num_workers)
     return dataloader
 
+def evaluate_model(dataloader, model, device):
+    predictions = []
+    labels = []
+    for data, label in dataloader:
+        # Get prediction form model
+        # Call a specific prediction function (standard forward pass)
+        data = data.to(device)
+        predictions.extend(model(data).cpu().detach().tolist())
+        labels.extend(label)
+    return predictions, labels
+
+
 def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_batch_size, num_workers, datadir=None):
     # List of all dirs, containing a small training dataset (/train or /train.txt) and a  test dir (/test or /test.txt).
     evaluationsdirs = [os.path.join(testdir, x) for x in os.listdir(testdir)]
@@ -47,15 +59,7 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
                                              approach.inference_transforms,
                                              val_batch_size, num_workers, False)
 
-            predictions = []
-            labels = []
-            for data, label in dataloader_test:
-                # Get prediction form model
-                # Call a specific prediction function (standard forward pass)
-                data = data.to(device)
-                predictions.extend(model(data).cpu().detach().tolist())
-                labels.extend(label)
-
+            predictions, labels = evaluate_model(dataloader_test, model, device)
             # Calculate KPIs
             # Compare predictions with ground truth
             results = calculate_kpis(predictions, labels)
