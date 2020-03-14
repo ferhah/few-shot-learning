@@ -65,6 +65,30 @@ class MainTest(unittest.TestCase):
                 results = evaluation.main.calculate_kpis(predictions, labels)
                 self.assertAlmostEqual(results['accuracy'], 1)
 
+    def test_evaluate(self):
+        input_size = 40
+        approach = Fixed_prediction_approach()
+        classdict = collections.defaultdict(lambda: [])
+        with tempfile.TemporaryDirectory() as folder:
+            lists = os.path.join(folder, 'imagelist', 'list01')
+            os.makedirs(lists)
+            with open(os.path.join(lists, 'test.txt'), 'w') as testfile, open(os.path.join(lists, 'train.txt'),
+                                                                              'w') as trainfile:
+                for idx in range(10):
+                    classfoldername = os.path.join(folder, 'class_{}'.format(idx))
+                    os.mkdir(classfoldername)
+                    for kdx in range(10):
+                        imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
+                        rndimg = create_image(input_size, idx)
+                        classdict[idx].append(rndimg)
+                        imageio.imsave(imagename, rndimg)
+                        testfile.write("{};{}\n".format(imagename, idx))
+                        trainfile.write("{};{}\n".format(imagename, idx))
+            for batchsize in [1, 4, 10, 50, 200]:
+                results, _ = evaluation.main.evaluate(lists, approach, 400,
+                                                               batchsize, 0, None, 'test', '', 'cpu')
+                self.assertAlmostEqual(results['accuracy'], 1)
+
 
 
 
