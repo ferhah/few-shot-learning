@@ -57,12 +57,13 @@ class MainTest(unittest.TestCase):
                     fp.write("{};{}\n".format(imagename, idx))
             fp.flush()
             fp.seek(0)
-            dataloader = evaluation.main.get_dataloader(fp.name.replace('.txt', ''), '', [ToTensor()],
-                                                        10, 0,
-                                                        False)
-            predictions, labels = evaluation.main.evaluate_model(dataloader, approach, 'cpu')
-            results = evaluation.main.calculate_kpis(predictions, labels)
-            self.assertAlmostEqual(results['accuracy'], 1)
+            for batchsize in [1, 4, 10, 50, 200]:
+                dataloader = evaluation.main.get_dataloader(fp.name.replace('.txt', ''), '', [ToTensor()],
+                                                            10, 0,
+                                                            False)
+                predictions, labels = evaluation.main.evaluate_model(dataloader, approach, 'cpu')
+                results = evaluation.main.calculate_kpis(predictions, labels)
+                self.assertAlmostEqual(results['accuracy'], 1)
 
 
 if __name__ == '__main__':
