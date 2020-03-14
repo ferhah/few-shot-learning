@@ -41,7 +41,7 @@ class Fixed_prediction_approach(object):
 
 
 class MainTest(unittest.TestCase):
-    def test_main(self):
+    def test_evaluate_model(self):
         input_size = 40
         approach = Fixed_prediction_approach()
         classdict = collections.defaultdict(lambda: [])
@@ -64,6 +64,8 @@ class MainTest(unittest.TestCase):
                 predictions, labels = evaluation.main.evaluate_model(dataloader, approach, 'cpu')
                 results = evaluation.main.calculate_kpis(predictions, labels)
                 self.assertAlmostEqual(results['accuracy'], 1)
+
+
 
 
 if __name__ == '__main__':
