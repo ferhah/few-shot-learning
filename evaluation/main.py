@@ -57,7 +57,7 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
 
             # Train model
             model, train_kpis = finetune_model(dataloader_train, approach, "%s_run_%d_%d" % (outfilename, eidx, aidx))
-            
+
             print("Start Evaluation")
             # Load Evaluation dataset
             dataloader_test = get_dataloader(os.path.join(evaluationdir, 'test'), datadir,
@@ -70,7 +70,6 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
             results = calculate_kpis(predictions, labels)
             print(eidx, len(evaluationsdirs), evaluationdir, aidx, approach, results)
             with open(outfilename + '.csv', "a") as outfile:
-                outfile.write("%s, %d, %s, %d, %s, %d, %d, %s\n" % (evaluationdir, eidx, approach, aidx, results,
-                                                            len(dataset_train), len(dataset_test), train_kpis))
-                outfile.write("%s, %d, %s, %d, %s\n" % (evaluationdir, eidx, approach, aidx, results))
+                outfile.write("%s, %d, %s, %d, %s, %s\n" % (evaluationdir, eidx, approach, aidx, results,
+                                                            train_kpis))
 
