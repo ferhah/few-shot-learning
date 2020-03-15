@@ -26,6 +26,11 @@ def get_dataloader(path, datadir, transforms, batch_size, num_workers, shuffle):
                                              shuffle=shuffle, num_workers=num_workers)
     return dataloader
 
+
+def finetune_model(dataloader, approach, log_dir):
+    return approach.train(dataloader, log_dir)
+
+
 def evaluate_model(dataloader, model, device):
     predictions = []
     labels = []
@@ -51,8 +56,8 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
                                               train_batch_size, num_workers, True)
 
             # Train model
-            # Call a specific training function
-            model = approach.train(dataloader_train, "%s_run_%d_%d" % (outfilename, eidx, aidx))
+            model, train_kpis = finetune_model(dataloader_train, approach, "%s_run_%d_%d" % (outfilename, eidx, aidx))
+            
             print("Start Evaluation")
             # Load Evaluation dataset
             dataloader_test = get_dataloader(os.path.join(evaluationdir, 'test'), datadir,
