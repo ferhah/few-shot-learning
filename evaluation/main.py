@@ -64,23 +64,8 @@ def evaluation(testdir, outfilename, approaches, device, train_batch_size, val_b
     for eidx, evaluationdir in enumerate(evaluationsdirs):
         for aidx, approach in enumerate(approaches):
             print(evaluationdir, approach)
-            # Load Training dataset
-            dataloader_train = get_dataloader(os.path.join(evaluationdir, 'train'), datadir, approach.train_transforms,
-                                              train_batch_size, num_workers, True)
-
-            # Train model
-            model, train_kpis = finetune_model(dataloader_train, approach, "%s_run_%d_%d" % (outfilename, eidx, aidx))
-
-            print("Start Evaluation")
-            # Load Evaluation dataset
-            dataloader_test = get_dataloader(os.path.join(evaluationdir, 'test'), datadir,
-                                             approach.inference_transforms,
-                                             val_batch_size, num_workers, False)
-
-            predictions, labels = evaluate_model(dataloader_test, model, device)
-            # Calculate KPIs
-            # Compare predictions with ground truth
-            results = calculate_kpis(predictions, labels)
+            results, train_kpis = evaluate(evaluationdir, approach, train_batch_size, val_batch_size, num_workers,
+                               "%s_run_%d_%d" % (outfilename, eidx, aidx), test_name, datadir, device)
             print(eidx, len(evaluationsdirs), evaluationdir, aidx, approach, results)
             with open(outfilename + '.csv', "a") as outfile:
                 outfile.write("%s, %d, %s, %d, %s, %s\n" % (evaluationdir, eidx, approach, aidx, results,
