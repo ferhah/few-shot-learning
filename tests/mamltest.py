@@ -1,6 +1,7 @@
 import unittest
 import train
 import tempfile
+import os
 
 class ArgWrapper():
     folder='data/miniimagenet'
@@ -27,8 +28,8 @@ class MAMLEvaluationTest(unittest.TestCase):
         args = ArgWrapper()
         with tempfile.TemporaryDirectory() as outfolder:
             args.output_folder = outfolder
-            train.main(args)
-
+            output_folder = train.main(args)
+            maml_approach = evaluation.maml_pretrained.MAML(os.path.join(args.output_folder, 'model.th'))
 
 if __name__ == '__main__':
     unittest.main()
