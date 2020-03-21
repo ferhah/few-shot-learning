@@ -92,7 +92,5 @@ class MainTest(unittest.TestCase):
                 self.assertAlmostEqual(results['accuracy'], 1)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
