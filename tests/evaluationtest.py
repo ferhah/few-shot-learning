@@ -17,7 +17,7 @@ def create_image(input_size, classidx):
     assert np.sum(img) == classidx
     return img.astype(np.uint8)
 
-def create_random_imagelists(classdict, folder, input_size):
+def create_random_imagelists(folder, input_size):
     lists = os.path.join(folder, 'imagelist', 'list01')
     os.makedirs(lists)
     with open(os.path.join(lists, 'test.txt'), 'w') as testfile, open(os.path.join(lists, 'train.txt'),
@@ -28,7 +28,6 @@ def create_random_imagelists(classdict, folder, input_size):
             for kdx in range(10):
                 imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
                 rndimg = create_image(input_size, idx)
-                classdict[idx].append(rndimg)
                 imageio.imsave(imagename, rndimg)
                 testfile.write("{};{}\n".format(imagename, idx))
                 trainfile.write("{};{}\n".format(imagename, idx))
@@ -85,9 +84,8 @@ class MainTest(unittest.TestCase):
     def test_evaluate(self):
         input_size = 40
         approach = Fixed_prediction_approach()
-        classdict = collections.defaultdict(lambda: [])
         with tempfile.TemporaryDirectory() as folder:
-            lists = create_random_imagelists(classdict, folder, input_size)
+            lists = create_random_imagelists(folder, input_size)
             for batchsize in [1, 4, 10, 50, 200]:
                 results, _ = evaluation.main.evaluate(lists, approach, 400,
                                                                batchsize, 0, None, 'test', '', 'cpu')
