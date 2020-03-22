@@ -30,7 +30,8 @@ def create_random_imagelists(folder, input_size):
                 rndimg = create_image(input_size, idx)
                 imageio.imsave(imagename, rndimg)
                 testfile.write("{};{}\n".format(imagename, idx))
-                trainfile.write("{};{}\n".format(imagename, idx))
+                if kdx <= 4:
+                    trainfile.write("{};{}\n".format(imagename, idx))
     return lists
 
 
