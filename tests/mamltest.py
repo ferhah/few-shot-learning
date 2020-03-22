@@ -1,6 +1,7 @@
 import unittest
 import train
 import tempfile
+import evaluation.maml_pretrained
 import os
 
 class ArgWrapper():
