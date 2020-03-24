@@ -19,3 +19,7 @@ class MAML():
     @property
     def train_transforms(self):
         return [Resize(84), ToTensor()]
+
+    @property
+    def inference_transforms(self):
+        return [Resize(84), ToTensor()]
