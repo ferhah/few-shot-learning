@@ -1,5 +1,6 @@
 import torch
 from maml.model import ModelConvMiniImagenet
+from torchvision.transforms import ToTensor, Resize
 import torch.nn
 import torch.nn.functional as F
 
@@ -15,3 +16,6 @@ class MAML():
         self.num_adaptation_steps=1
         self.loss_function = F.cross_entropy
 
+    @property
+    def train_transforms(self):
+        return [Resize(84), ToTensor()]
