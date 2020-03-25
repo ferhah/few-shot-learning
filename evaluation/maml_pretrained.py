@@ -23,3 +23,7 @@ class MAML():
     @property
     def inference_transforms(self):
         return [Resize(84), ToTensor()]
+
+    def train(self, dataloader, log_dir=None):
+        self.log_dir = log_dir
+        
