@@ -5,6 +5,16 @@ from torchvision.transforms import ToTensor, Resize
 import torch.nn
 import torch.nn.functional as F
 
+class ModelWrapper(torch.nn.Module):
+    def __init__(self, model, parameters):
+        super(ModelWrapper, self).__init__()
+        self.model = model
+        self.parameters = parameters
+
+    def forward(self, inputs):
+        #self.model.eval()
+        return self.model(inputs, params=self.parameters)
+
 class MAML():
     def __init__(self, modelpath=None, device=None):
         if device is None:
@@ -39,4 +49,4 @@ class MAML():
                                                       step_size=0.1, first_order=True)
                 # TODO: Multiple batches did not work (yet). Therefore training batch size needs to be big enough to cover all training samples
                 break
-        return self, None
+        return ModelWrapper(self.model, params), None
