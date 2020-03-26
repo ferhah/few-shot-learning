@@ -38,6 +38,7 @@ class MAML():
     def train(self, dataloader, log_dir=None):
         self.log_dir = log_dir
         params = None
+        self.model.train(True)
         for step in range(self.num_adaptation_steps):
             for imgs, labels in dataloader:
                 imgs, labels = imgs.to(self.device), labels.to(self.device)
@@ -49,4 +50,5 @@ class MAML():
                                                       step_size=0.1, first_order=True)
                 # TODO: Multiple batches did not work (yet). Therefore training batch size needs to be big enough to cover all training samples
                 break
+        self.model.eval()
         return ModelWrapper(self.model, params), None
