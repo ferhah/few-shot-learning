@@ -12,7 +12,6 @@ class ModelWrapper(torch.nn.Module):
         self.parameters = parameters
 
     def forward(self, inputs):
-        #self.model.eval()
         return self.model(inputs, params=self.parameters)
 
 class MAML():
