@@ -38,5 +38,6 @@ class MAMLEvaluationTest(unittest.TestCase):
                 results, _ = evaluation.main.evaluate(imagelistfolder, maml_approach, 400,
                                                                batchsize, 0, None, 'test', '', 'cpu')
 
+
 if __name__ == '__main__':
     unittest.main()
