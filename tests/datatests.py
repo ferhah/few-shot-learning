@@ -13,21 +13,24 @@ import scipy.misc
 import imageio
 
 
+def create_random_imagelist(folder, fp, input_size):
+    for idx in range(10):
+        classfoldername = os.path.join(folder, 'class_{}'.format(idx))
+        os.mkdir(classfoldername)
+        for kdx in range(10):
+            imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
+            rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
+            imageio.imsave(imagename, rndimg)
+            fp.write("{};{}\n".format(imagename, idx))
+    fp.flush()
+    fp.seek(0)
+
 class DataloaderTest(unittest.TestCase):
     def test_imagelist(self):
         input_size=224
         # Create Files
         with tempfile.TemporaryDirectory() as folder, tempfile.NamedTemporaryFile(mode='w+t') as fp:
-            for idx in range(10):
-                classfoldername = os.path.join(folder, 'class_{}'.format(idx))
-                os.mkdir(classfoldername)
-                for kdx in range(10):
-                    imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
-                    rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
-                    imageio.imsave(imagename, rndimg)
-                    fp.write("{};{}\n".format(imagename, idx))
-            fp.flush()
-            fp.seek(0)
+            create_random_imagelist(folder, fp, input_size)
 
             # Create dataloader
             dataset_folder = torchvision.datasets.ImageFolder(folder,
