@@ -8,14 +8,8 @@ import torch
 from torchvision.transforms import ToTensor
 import collections
 
+from tests.datatests import create_image
 
-def create_image(input_size, classidx):
-    img = np.zeros((input_size, input_size))
-    x = np.random.choice(input_size, classidx, replace=False)
-    y = np.random.choice(input_size, classidx, replace=True)
-    img[x, y] = 1
-    assert np.sum(img) == classidx
-    return img.astype(np.uint8)
 
 def create_random_imagelists(folder, input_size):
     lists = os.path.join(folder, 'imagelist', 'list01')

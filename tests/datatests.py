@@ -12,6 +12,16 @@ import collections
 import scipy.misc
 import imageio
 
+
+def create_image(input_size, classidx):
+    img = np.zeros((input_size, input_size))
+    x = np.random.choice(input_size, classidx, replace=False)
+    y = np.random.choice(input_size, classidx, replace=True)
+    img[x, y] = 1
+    assert np.sum(img) == classidx
+    return img.astype(np.uint8)
+
+
 def create_random_image(input_size):
     rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
     return rndimg
