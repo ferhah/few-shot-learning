@@ -26,6 +26,7 @@ def create_random_image(input_size, _):
     rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
     return rndimg
 
+
 def create_random_imagelist(folder, fp, input_size, create_image_fkt=None):
     if not create_image_fkt:
         create_image_fkt=create_random_image
@@ -39,6 +40,7 @@ def create_random_imagelist(folder, fp, input_size, create_image_fkt=None):
             fp.write("{};{}\n".format(imagename, idx))
     fp.flush()
     fp.seek(0)
+    
 
 class DataloaderTest(unittest.TestCase):
     def test_imagelist(self):
