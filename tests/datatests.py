@@ -11,6 +11,10 @@ import numpy as np
 import collections
 import scipy.misc
 import imageio
+from torchmeta.utils.data import BatchMetaDataLoader
+from torchmeta.utils.data import CombinationMetaDataset
+from torchmeta.transforms import ClassSplitter, Categorical
+import data
 
 
 def create_image(input_size, classidx):
@@ -98,6 +102,35 @@ class DataloaderTest(unittest.TestCase):
                             break
                     else:
                         self.assertTrue(False, "Image not found")
+
+
+
+    def test_meta_imagelist(self):
+        input_size=40
+        num_ways=10
+        num_shots=4
+        num_shots_test=4
+        batch_size=1
+        num_workers=0
+        with tempfile.TemporaryDirectory() as folder, tempfile.NamedTemporaryFile(mode='w+t') as fp:
+            create_random_imagelist(folder, fp, input_size, create_image)
+            dataset = data.ImagelistMetaDataset(imagelistname=fp,
+                                                root='',
+                                                transform=transforms.Compose([
+                                                    transforms.Resize(input_size),
+                                                    transforms.ToTensor()
+                                                ]))
+            meta_dataset = CombinationMetaDataset(dataset, num_classes_per_task=num_ways,
+                                                  target_transform=Categorical(num_ways),
+                                                  dataset_transform=ClassSplitter(shuffle=True,
+                                                                                  num_train_per_class=num_shots,
+                                                                                  num_test_per_class=num_shots_test))
+            meta_dataloader = BatchMetaDataLoader(meta_dataset,
+                                                  batch_size=batch_size,
+                                                  shuffle=True,
+                                                  num_workers=num_workers,
+                                                  pin_memory=True)
+
 
 if __name__ == '__main__':
     unittest.main()
