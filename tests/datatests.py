@@ -22,7 +22,7 @@ def create_image(input_size, classidx):
     return img.astype(np.uint8)
 
 
-def create_random_image(input_size):
+def create_random_image(input_size, _):
     rndimg = np.random.randint(low=0, high=254, size=(input_size, input_size)).astype(np.uint8)
     return rndimg
 
@@ -34,7 +34,7 @@ def create_random_imagelist(folder, fp, input_size, create_image_fkt=None):
         os.mkdir(classfoldername)
         for kdx in range(10):
             imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
-            rndimg = create_random_image(input_size)
+            rndimg = create_image_fkt(input_size, idx)
             imageio.imsave(imagename, rndimg)
             fp.write("{};{}\n".format(imagename, idx))
     fp.flush()
