@@ -114,7 +114,7 @@ class DataloaderTest(unittest.TestCase):
         num_workers=0
         with tempfile.TemporaryDirectory() as folder, tempfile.NamedTemporaryFile(mode='w+t') as fp:
             create_random_imagelist(folder, fp, input_size, create_image)
-            dataset = data.ImagelistMetaDataset(imagelistname=fp,
+            dataset = data.ImagelistMetaDataset(imagelistname=fp.name,
                                                 root='',
                                                 transform=transforms.Compose([
                                                     transforms.Resize(input_size),
