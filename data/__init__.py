@@ -66,7 +66,7 @@ class ImagelistMetaDataset(ImagelistData):
         data = self._data[class_name]
 
         return ImagelistMetaData(data, class_name, transform=self.transform,
-            target_transform=self.target_transform, dbg=self.dbg)
+            target_transform=self.target_transform)
 
     def __len__(self):
         return self.num_classes
