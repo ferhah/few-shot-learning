@@ -9,13 +9,11 @@ import tempfile
 import os
 import numpy as np
 import collections
-import scipy.misc
 import imageio
 from torchmeta.utils.data import BatchMetaDataLoader
 from torchmeta.utils.data import CombinationMetaDataset
 from torchmeta.transforms import ClassSplitter, Categorical
 import data
-
 
 def create_image(input_size, classidx):
     img = np.zeros((input_size, input_size))
