@@ -131,6 +131,26 @@ class DataloaderTest(unittest.TestCase):
                                                   num_workers=num_workers,
                                                   pin_memory=True)
 
+            for batch in meta_dataloader:
+                batch_data, batch_label = batch['train']
+                for img_train, label_train, img_test, label_test in zip(*batch['train'], *batch['test']):
+                    classmap = {}
+                    for idx in range(img_train.shape[0]):
+                        npimg = img_train[idx, ...].detach().numpy()
+                        npimg[npimg < 0.001] = 0
+                        imagesum = int(np.sum(npimg)*255)
+                        if imagesum not in classmap:
+                            classmap[imagesum] = int(label_train[idx])
+                        self.assertEqual(classmap[imagesum], int(label_train[idx]))
+
+                    for idx in range(img_test.shape[0]):
+                        npimg = img_test[idx, ...].detach().numpy()
+                        npimg[npimg < 0.001] = 0
+                        imagesum = int(np.sum(npimg)*255)
+                        self.assertEqual(classmap[imagesum], int(label_test[idx]), "Error on {}".format(idx))
+
+
 
 if __name__ == '__main__':
     unittest.main()
+
