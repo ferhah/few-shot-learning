@@ -82,7 +82,7 @@ class ImagelistMetaData(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        image = Image.open(self.data[index])
+        image = Image.open(self.data[index]).convert('RGB')
         target = self.class_name
 
         if self.transform is not None:
