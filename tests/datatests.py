@@ -35,14 +35,14 @@ def create_random_imagelist(folder, fp, input_size, create_image_fkt=None):
     for idx in range(10):
         classfoldername = os.path.join(folder, 'class_{}'.format(idx))
         os.mkdir(classfoldername)
-        for kdx in range(10):
+        for kdx in range(30):
             imagename = os.path.join(classfoldername, "img_{}.png".format(kdx))
             rndimg = create_image_fkt(input_size, idx)
             imageio.imsave(imagename, rndimg)
             fp.write("{};{}\n".format(imagename, idx))
     fp.flush()
     fp.seek(0)
-    
+
 
 class DataloaderTest(unittest.TestCase):
     def test_imagelist(self):
@@ -110,6 +110,24 @@ class DataloaderTest(unittest.TestCase):
         num_shots_test=4
         batch_size=1
         num_workers=0
+        self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+
+        for batch_size in [2, 10]:
+            self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+        batch_size = 1
+        for num_shots in [8, 10]:
+            self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+        num_shots = 4
+        for num_shots_test in [8, 10]:
+            self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+        num_shots_test = 4
+        for num_ways in [4]:
+            self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+        for num_workers in [1, 2]:
+            self.helper_meta_imagelist(batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers)
+
+
+    def helper_meta_imagelist(self, batch_size, input_size, num_shots, num_shots_test, num_ways, num_workers):
         with tempfile.TemporaryDirectory() as folder, tempfile.NamedTemporaryFile(mode='w+t') as fp:
             create_random_imagelist(folder, fp, input_size, create_image)
             dataset = data.ImagelistMetaDataset(imagelistname=fp.name,
