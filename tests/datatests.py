@@ -154,7 +154,7 @@ class DataloaderTest(unittest.TestCase):
                     for idx in range(img_train.shape[0]):
                         npimg = img_train[idx, ...].detach().numpy()
                         npimg[npimg < 0.001] = 0
-                        imagesum = int(np.sum(npimg)*255)
+                        imagesum = int(np.sum(npimg) * 255)
                         if imagesum not in classmap:
                             classmap[imagesum] = int(label_train[idx])
                         self.assertEqual(classmap[imagesum], int(label_train[idx]))
@@ -162,9 +162,8 @@ class DataloaderTest(unittest.TestCase):
                     for idx in range(img_test.shape[0]):
                         npimg = img_test[idx, ...].detach().numpy()
                         npimg[npimg < 0.001] = 0
-                        imagesum = int(np.sum(npimg)*255)
+                        imagesum = int(np.sum(npimg) * 255)
                         self.assertEqual(classmap[imagesum], int(label_test[idx]), "Error on {}".format(idx))
-
 
 
 if __name__ == '__main__':
