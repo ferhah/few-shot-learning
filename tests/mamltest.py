@@ -6,23 +6,26 @@ import os
 import tests.evaluationtest
 
 class ArgWrapper():
-    folder='data/miniimagenet'
-    dataset='miniimagenet'
-    output_folder='tests_output/'
-    num_ways=10
-    num_shots=4
-    num_shots_test=4
-    hidden_size=64
-    batch_size=5
-    num_steps=1
-    num_epochs=1
-    num_batches=1
-    step_size=0.1
-    first_order=False
-    meta_lr=0.001
-    num_workers=0
-    verbose=True
-    use_cuda=False
+    def __init__(self):
+        self.folder = 'data/miniimagenet'
+        self.dataset = 'miniimagenet'
+        self.output_folder = 'tests_output/'
+        self.num_ways = 10
+        self.num_shots = 4
+        self.num_shots_test = 4
+        self.hidden_size = 64
+        self.batch_size = 5
+        self.num_steps = 1
+        self.num_epochs = 1
+        self.num_batches = 1
+        self.step_size = 0.1
+        self.first_order = False
+        self.meta_lr = 0.001
+        self.num_workers = 0
+        self.verbose = True
+        self.use_cuda = False
+        self.dbg_save_path = None
+
 
 class MAMLEvaluationTest(unittest.TestCase):
     def test_basic_functionality(self):
