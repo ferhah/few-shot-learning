@@ -4,6 +4,20 @@ import tempfile
 import evaluation.maml_pretrained
 import os
 import tests.evaluationtest
+import tests.datatests
+import data
+from torchmeta.utils.data import BatchMetaDataLoader
+from torchmeta.utils.data import CombinationMetaDataset
+from torchmeta.transforms import ClassSplitter, Categorical
+from torchvision import transforms
+from maml.datasets import Benchmark
+import torch.nn.functional as F
+from maml.model import ModelConvMiniImagenet
+import logging
+from collections import namedtuple
+import pickle
+import torch
+
 
 class ArgWrapper():
     def __init__(self):
@@ -40,6 +54,38 @@ class MAMLEvaluationTest(unittest.TestCase):
             for batchsize in [1, 4, 10, 50, 200]:
                 results, _ = evaluation.main.evaluate(imagelistfolder, maml_approach, 400,
                                                                batchsize, 0, None, 'test', '', 'cpu')
+
+    def test_custom_db(self):
+        pil_logger = logging.getLogger('PIL')
+        pil_logger.setLevel(logging.INFO)
+        input_size = 40
+        num_ways = 10
+        num_shots = 4
+        num_shots_test = 4
+        batch_size = 1
+        num_workers = 0
+        with tempfile.TemporaryDirectory() as folder, tempfile.NamedTemporaryFile(mode='w+t') as fp:
+            tests.datatests.create_random_imagelist(folder, fp, input_size)
+            dataset = data.ImagelistMetaDataset(imagelistname=fp.name,
+                                                root='',
+                                                transform=transforms.Compose([
+                                                    transforms.Resize(84),
+                                                    transforms.ToTensor()
+                                                ]))
+            meta_dataset = CombinationMetaDataset(dataset, num_classes_per_task=num_ways,
+                                                  target_transform=Categorical(num_ways),
+                                                  dataset_transform=ClassSplitter(shuffle=True,
+                                                                                  num_train_per_class=num_shots,
+                                                                                  num_test_per_class=num_shots_test))
+            args = ArgWrapper()
+            args.output_folder = folder
+            args.dataset = None
+            benchmark = Benchmark(meta_train_dataset=meta_dataset,
+                                  meta_val_dataset=meta_dataset,
+                                  meta_test_dataset=meta_dataset,
+                                  model=ModelConvMiniImagenet(args.num_ways, hidden_size=args.hidden_size),
+                                  loss_function=F.cross_entropy)
+            train.main(args, benchmark)
 
 
 if __name__ == '__main__':
