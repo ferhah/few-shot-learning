@@ -87,6 +87,59 @@ class MAMLEvaluationTest(unittest.TestCase):
                                   loss_function=F.cross_entropy)
             train.main(args, benchmark)
 
+    def test_inference(self):
+        '''
+        'train_inputs': train_inputs,
+         'train_targets': train_targets,
+         'test_inputs': test_inputs,
+         'test_targets': test_targets,
+         'test_logits': test_logits,
+         'adaptation_results': adaptation_results})
+        '''
+        pil_logger = logging.getLogger('PIL')
+        pil_logger.setLevel(logging.INFO)
+        input_size = 40
+        args = ArgWrapper()
+        with tempfile.TemporaryDirectory() as outfolder:
+            args.output_folder = outfolder
+            args.dbg_save_path = os.path.join(outfolder, "debug_infos_{}_{}")
+            output_folder = train.main(args)
+            #os.system("ls {}".format(outfolder))
+            with open(args.dbg_save_path.format(0, 0), 'rb') as infile:
+                groundtruth = pickle.load(infile)
+            maml_approach = evaluation.maml_pretrained.MAML(os.path.join(output_folder, 'model.th'))
+
+            # Check model parameters
+            new_model, _ = evaluation.main.finetune_model([[groundtruth['train_inputs'], groundtruth['train_targets']]],
+                                                           maml_approach, None)
+            for k in groundtruth['params']:
+                self.assertTrue(torch.allclose(groundtruth['params'][k], new_model.parameters[k]))
+
+            # To ensure that both parameters contains the same keys.
+            for k in new_model.parameters:
+                self.assertTrue(torch.allclose(groundtruth['params'][k], new_model.parameters[k]))
+
+            # Check logits
+            logits = new_model(groundtruth['test_inputs'])
+            self.assertTrue(torch.allclose(groundtruth['test_logits'], logits))
+
+            predictions, _ = evaluation.main.evaluate_model([[groundtruth['test_inputs'], groundtruth['test_targets']]],
+                                                            new_model, 'cpu')
+            # TODO: more efficient/pythonic comparison
+            for pred, gt_logits in zip(predictions, groundtruth['test_logits']):
+                for p, gt in zip(pred, gt_logits):
+                    self.assertAlmostEqual(p, gt)
+
+            predictions, _ = evaluation.main.evaluate_model([[groundtruth['test_inputs'][0:1],
+                                                              groundtruth['test_targets'][0:1]]],
+                                                            new_model, 'cpu')
+            # TODO: more efficient/pythonic comparison
+            print(predictions)
+            print(groundtruth['test_logits'].detach().numpy())
+            for pred, gt_logits in zip(predictions, groundtruth['test_logits'].detach().numpy()):
+                for p, gt in zip(pred, gt_logits):
+                    self.assertAlmostEqual(p, gt, places=4)
+
 
 if __name__ == '__main__':
     unittest.main()
